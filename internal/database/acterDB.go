@@ -173,3 +173,38 @@ func GetALLActerFilmsDB(id int) (*sql.Rows, error) {
 
 	return rows, nil
 }
+
+func FindActerByIdDB(id int) (*sql.Rows, error) {
+	db, err := DBconnection()
+	if err != nil {
+		return nil, err
+	}
+	defer db.Close()
+
+	res, err := db.Query(`
+		SELECT id, name,  sex, dateOfBirth
+		FROM acters
+		WHERE id =  $1`,
+		id)
+	if err != nil {
+		return nil, err
+	}
+	//fmt.Println(res)
+	return res, nil
+
+}
+
+func DeleteAllActerFilmsDB(id int) error {
+	db, err := DBconnection()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	_, err = db.Exec(`
+		DELETE FROM film_acters WHERE acter_id = $1`, id)
+	if err != nil {
+		return err
+	}
+	return nil
+}

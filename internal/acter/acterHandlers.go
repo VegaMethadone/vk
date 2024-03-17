@@ -1,30 +1,153 @@
 package acter
 
 import (
-	"fmt"
+	"encoding/json"
 	"net/http"
+	"strconv"
+
+	"vk/internal/authentication"
+	"vk/internal/database"
 )
 
-func ChangeActerNameHandler(a *Acter) http.HandlerFunc {
+func AddNewActerHandler(a *Acter) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		newName := r.FormValue("name")
-		a.ChangeName(newName)
-		fmt.Fprint(w, "Name is changed %s", newName)
+		if r.Method == http.MethodPost {
+			c, err := authentication.CookieCheker(w, r)
+			if err != nil {
+				http.Error(w, "Cookie is damaged", http.StatusBadRequest)
+				return
+			}
+			userData := new(authentication.User)
+			err = json.Unmarshal(c, userData)
+			if err != nil {
+				http.Error(w, "Cookie is damaged", http.StatusBadRequest)
+				return
+			}
+			if userData.Access < 1 {
+				http.Error(w, "Access denied", http.StatusUnauthorized)
+				return
+			}
+
+			parsedTime := ParseTime(r.FormValue("date"))
+			newActer := &Acter{
+				Name:        r.FormValue("name"),
+				Sex:         r.FormValue("sex"),
+				DateOfBirth: parsedTime,
+			}
+
+			result, err := database.AddNewActerDB(newActer.Name, newActer.Sex, newActer.DateOfBirth)
+			if err != nil {
+				http.Error(w, "Server  error", http.StatusInternalServerError)
+				return
+			}
+
+			if result {
+				w.WriteHeader(http.StatusOK)
+			} else {
+				w.WriteHeader(http.StatusInternalServerError)
+			}
+		} else {
+			http.Error(w, "Not allowed", http.StatusBadRequest)
+		}
 	}
 }
 
-func ChangeActerSex(a *Acter) http.HandlerFunc {
+func ChangeActerInfoHandler(a *Acter) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		newSex := r.FormValue("sex")
-		a.ChangeSex(newSex)
-		fmt.Fprintf(w, "Sex is changed %s", newSex)
+		if r.Method == http.MethodPost {
+			c, err := authentication.CookieCheker(w, r)
+			if err != nil {
+				http.Error(w, "Cookie is damaged", http.StatusBadRequest)
+				return
+			}
+			userData := new(authentication.User)
+			err = json.Unmarshal(c, userData)
+			if err != nil {
+				http.Error(w, "Cookie is damaged", http.StatusBadRequest)
+				return
+			}
+			if userData.Access < 1 {
+				http.Error(w, "Access denied", http.StatusUnauthorized)
+				return
+			}
+
+			parsedTime := ParseTime(r.FormValue("date"))
+			parsedId, _ := strconv.Atoi(r.FormValue("id"))
+			updateActer := &Acter{
+				Id:          parsedId,
+				Name:        r.FormValue("name"),
+				Sex:         r.FormValue("sex"),
+				DateOfBirth: parsedTime,
+			}
+
+			result := ChangeActerInfo(updateActer.Id, updateActer.Name, updateActer.Sex, updateActer.DateOfBirth)
+			if result {
+				w.WriteHeader(http.StatusAccepted)
+			} else {
+				w.WriteHeader(http.StatusInternalServerError)
+			}
+
+		} else {
+			http.Error(w, "Not allowed", http.StatusBadRequest)
+		}
 	}
 }
 
-func ChangeActerDate(a *Acter) http.HandlerFunc {
+func DeleteActerInfoHandler(a *Acter) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		newDate := r.FormValue("date")
-		a.ChangeDate(newDate)
-		fmt.Fprintf(w, "Birthday date is changed %s", newDate)
+		if r.Method == http.MethodPost {
+			c, err := authentication.CookieCheker(w, r)
+			if err != nil {
+				http.Error(w, "Cookie is damaged", http.StatusBadRequest)
+				return
+			}
+			userData := new(authentication.User)
+			err = json.Unmarshal(c, userData)
+			if err != nil {
+				http.Error(w, "Cookie is damaged", http.StatusBadRequest)
+				return
+			}
+			if userData.Access < 1 {
+				http.Error(w, "Access denied", http.StatusUnauthorized)
+				return
+			}
+
+			acterId, _ := strconv.Atoi(r.FormValue("id"))
+
+			result := DeleteActer(acterId)
+			if result {
+				w.WriteHeader(http.StatusOK)
+			} else {
+				w.WriteHeader(http.StatusInternalServerError)
+			}
+
+		} else {
+			http.Error(w, "Not allowed", http.StatusBadRequest)
+		}
+	}
+}
+
+func GetAllActersHandler(a *Acter) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodGet {
+			_, err := authentication.CookieCheker(w, r)
+			if err != nil {
+				http.Error(w, "Cookie is damaged", http.StatusBadRequest)
+				return
+			}
+
+			result := GetAllActersList()
+
+			jsonData, err := json.Marshal(result)
+			if err != nil {
+				http.Error(w, "Server error", http.StatusInternalServerError)
+				return
+			}
+
+			w.Header().Set("Content-Type", "application/json")
+			w.Write(jsonData)
+		} else {
+			http.Error(w, "Not allowed", http.StatusBadRequest)
+		}
 	}
 }
