@@ -2,35 +2,35 @@ package film
 
 import "sort"
 
-type ByRate []film
+type ByRate []Film
 
 func (a ByRate) Len() int           { return len(a) }
 func (a ByRate) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a ByRate) Less(i, j int) bool { return a[i].rate > a[j].rate }
+func (a ByRate) Less(i, j int) bool { return a[i].Rate > a[j].Rate }
 
-func SortFilmsByRate(films []film) []film {
+func SortFilmsByRate(films []Film) []Film {
 	sort.Sort(ByRate(films))
 	return films
 }
 
-type ByName []film
+type ByName []Film
 
 func (a ByName) Len() int           { return len(a) }
 func (a ByName) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a ByName) Less(i, j int) bool { return a[i].name < a[j].name }
+func (a ByName) Less(i, j int) bool { return a[i].Name < a[j].Name }
 
-func SortFilmsByName(films []film) []film {
+func SortFilmsByName(films []Film) []Film {
 	sort.Sort(ByName(films))
 	return films
 }
 
-type ByDate []film
+type ByDate []Film
 
 func (a ByDate) Len() int           { return len(a) }
 func (a ByDate) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a ByDate) Less(i, j int) bool { return a[i].enterdate.After(a[j].enterdate) }
+func (a ByDate) Less(i, j int) bool { return a[i].Enterdate.After(a[j].Enterdate) }
 
-func SortFilmsByDate(films []film) []film {
+func SortFilmsByDate(films []Film) []Film {
 	sort.Sort(ByDate(films))
 	return films
 }

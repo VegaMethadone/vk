@@ -56,7 +56,7 @@ func EnterUserHandler(u *User) http.HandlerFunc {
 					http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 					return
 				}
-				//fix
+
 				token := base64Encode(userJSON)
 				CookieSeter(w, r, token)
 

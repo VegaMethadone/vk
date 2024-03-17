@@ -4,20 +4,13 @@ import (
 	"time"
 )
 
-type film struct {
-	id          int
-	name        string // не более 150 символов
-	description string //  не более 1000 символов
-	enterdate   time.Time
-	rate        float64
-	score       int
-	acters      []int
-}
-
-type Film interface {
-	AddNewFilm(string, string, time.Time, []int)
-	FindFilm()
-	ChangeFilmInfo()
-	DeleteFilm()
-	GetAllFilms() []film
+type Film struct {
+	Id          int       `json:"id"`
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
+	Enterdate   time.Time `json:"enterdate"`
+	Rate        float64   `json:"rate"`
+	Score       int       `json:"score"`
+	Votes       int       `json:"votes"`
+	Acters      []int     `json:"acters"`
 }
