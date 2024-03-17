@@ -82,6 +82,24 @@ func FindFilmDB(name string) (bool, *sql.Rows, error) {
 
 }
 
+func FindFilmByIdDB(id int) (bool, *sql.Rows, error) {
+	db, err := DBconnection()
+	if err != nil {
+		return false, nil, err
+	}
+	defer db.Close()
+
+	res, err := db.Query(`
+		SELECT id, name, description,  enterdate, rate, score, votes
+		FROM filmse
+		WHERE id = $1`, id)
+	if err != nil {
+		return false, nil, err
+	}
+	//fmt.Println(res)
+	return true, res, nil
+}
+
 func FindFilmActersDB(id int) (bool, *sql.Rows, error) {
 	db, err := DBconnection()
 	if err != nil {
@@ -165,4 +183,56 @@ func GetAllFilmActersDB(id int) (*sql.Rows, error) {
 	}
 
 	return rows, nil
+}
+
+func ChangeFilmInfoDB(id int, name, description string, enterdate time.Time, score, votes int, acters []int) (bool, error) {
+	db, err := DBconnection()
+	if err != nil {
+		return false, err
+	}
+	defer db.Close()
+
+	result, err := db.Exec(`
+		UPDATE films
+		SET name= $1, 
+		description= $2, 
+		enterdate= $3, 
+		rate= $4, 
+		score=  $5, 
+		votes= $6 
+		WHERE id = $7`,
+		name, description, enterdate, score/votes, score, votes, id)
+	if err != nil {
+		fmt.Println("Error during setting new film data")
+		return false, err
+	}
+	fmt.Println(result)
+
+	DeleteFilmActers(id)
+
+	for _, acterId := range acters {
+		_, err := db.Exec(`
+			INSERT INTO film_acters (film_id, acter_id) VALUES ($1, $2)`, id, acterId)
+		if err != nil {
+			return false, err
+		}
+	}
+
+	return true, nil
+}
+
+func DeleteFilmActers(filmID int) (bool, error) {
+	db, err := DBconnection()
+	if err != nil {
+		return false, err
+	}
+	defer db.Close()
+
+	res, err := db.Exec(`
+		DELETE FROM film_acters WHERE film_id =  $1`, filmID)
+	if err != nil {
+		return false, err
+	}
+	fmt.Println(res)
+	return true, nil
 }

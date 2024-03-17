@@ -47,3 +47,13 @@ func AddNewFilm(name, description string, enterdate time.Time, acters []int) boo
 	}
 	return result
 }
+
+func ChangeFilmInfo(id int, name, description string, enterdate time.Time, score, votes int, acters []int) bool {
+	newName := strings.ToLower(name)
+	result, err := database.ChangeFilmInfoDB(id, newName, description, enterdate, score, votes, acters)
+	if err != nil {
+		return false
+	}
+
+	return result
+}
