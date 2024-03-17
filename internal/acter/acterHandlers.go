@@ -2,6 +2,7 @@ package acter
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -137,8 +138,12 @@ func GetAllActersHandler(a *Acter) http.HandlerFunc {
 			}
 
 			result := GetAllActersList()
+			fmt.Println("RESULT: ", result)
 
 			jsonData, err := json.Marshal(result)
+			//COMMENT
+			fmt.Println("JSON DATA:", string(jsonData))
+			//COMMENT
 			if err != nil {
 				http.Error(w, "Server error", http.StatusInternalServerError)
 				return
