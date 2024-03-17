@@ -4,7 +4,63 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"time"
 )
+
+func AddNewFilmDB(name, description string, enterdate time.Time, acters []int) (bool, error) {
+	db, err := DBconnection()
+	if err != nil {
+		return false, err
+	}
+	defer db.Close()
+
+	rate := 0.0
+	score := 0
+	votes := 0
+
+	res, err := db.Exec(`
+		INSERT INTO films (name, description, enterdate, rate, score, votes) VALUES ($1, $2, $3, $4, $5, $6)`,
+		name, description, enterdate, rate, score, votes)
+	if err != nil {
+		fmt.Println("Error duing inserting")
+		return false, err
+	}
+
+	_, film, err := FindFilmDB(name)
+	if err != nil {
+		fmt.Println("Error during finding film")
+		return false, err
+	}
+	var filmID int
+
+	for film.Next() {
+		film.Scan(&filmID, &name, &description, &enterdate, &rate, &score, &votes)
+	}
+
+	//PRINT FILM ID
+	fmt.Println("Film ID:", filmID)
+
+	for _, acterID := range acters {
+		_, err = FindActerByIdDB(acterID)
+		if err != nil {
+			continue
+		} else {
+			//COMMENT
+			fmt.Println("Found acter id,", acterID)
+			//COMMENT
+			res, err := db.Exec(`
+				INSERT INTO film_acters (film_id, acter_id) VALUES ($1, $2)`, filmID, acterID)
+			if err != nil {
+				return false, err
+			}
+			fmt.Println(res)
+		}
+	}
+	fmt.Println(res)
+	return true, nil
+}
+
+//
 
 func FindFilmDB(name string) (bool, *sql.Rows, error) {
 	db, err := DBconnection()
@@ -59,8 +115,6 @@ func DeleteFilmDB(id int) (bool, error) {
 	fmt.Println(res)
 	return true, nil
 }
-
-///
 
 func FindFilmByFragment(fragment string) (bool, *sql.Rows, error) {
 	db, err := DBconnection()

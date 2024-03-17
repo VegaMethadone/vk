@@ -10,7 +10,7 @@ func TestSortFilmsByRate(t *testing.T) {
 	result = SortFilmsByRate(result)
 
 	for key, value := range result {
-		log.Printf("Index:  %d, Name: %s,  Rate: %f\n", key, value.name, value.rate)
+		log.Printf("Index:  %d, Name: %s,  Rate: %f\n", key, value.Name, value.Rate)
 	}
 }
 
@@ -19,7 +19,7 @@ func TestSortFilmsByName(t *testing.T) {
 	result = SortFilmsByName(result)
 
 	for key, value := range result {
-		log.Printf("Index:  %d, Name: %s\n", key, value.name)
+		log.Printf("Index:  %d, Name: %s\n", key, value.Name)
 	}
 }
 
@@ -28,6 +28,6 @@ func TestSortFilmsByDate(t *testing.T) {
 	result = SortFilmsByDate(result)
 
 	for key, value := range result {
-		log.Printf("Index:  %d, Name: %s, Date: %v\n", key, value.name, value.enterdate)
+		log.Printf("Index:  %d, Name: %s, Date: %v\n", key, value.Name, value.Enterdate)
 	}
 }

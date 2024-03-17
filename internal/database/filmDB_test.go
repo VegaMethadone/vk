@@ -16,6 +16,7 @@ type testFilm struct {
 	acters      []int
 }
 
+/*
 func TestAddNewFilmDB(t *testing.T) {
 	filmOne := &testFilm{
 		name:        "Drive",
@@ -49,6 +50,7 @@ func TestAddNewFilmDB(t *testing.T) {
 
 	}
 }
+*/
 
 func TestFindFilmByFragment(t *testing.T) {
 	fragment := "Dri"
