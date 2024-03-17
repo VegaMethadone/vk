@@ -3,6 +3,7 @@ package film
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -134,6 +135,148 @@ func ChangeFilmInfoHandler(f *Film) http.HandlerFunc {
 			} else {
 				http.Error(w, "Adding  failed", http.StatusInternalServerError)
 			}
+
+		} else {
+			http.Error(w, "Not allowed", http.StatusBadRequest)
+		}
+	}
+}
+
+func GetFilmByFragmentHandler(f *Film) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodGet {
+			_, err := authentication.CookieCheker(w, r)
+			if err != nil {
+				http.Error(w, "Cookie is damaged", http.StatusBadRequest)
+				return
+			}
+
+			result := GetFilmByFragment(r.FormValue("name"))
+
+			jsonData, err := json.Marshal(result)
+			if err != nil {
+				http.Error(w, "Server error", http.StatusInternalServerError)
+				return
+			}
+
+			w.Header().Set("Content-Type", "application/json")
+			w.Write(jsonData)
+
+		} else {
+			http.Error(w, "Not allowed", http.StatusBadRequest)
+		}
+	}
+}
+
+func DeleteFilmHandler(f *Film) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodDelete {
+			c, err := authentication.CookieCheker(w, r)
+			if err != nil {
+				http.Error(w, "Cookie is damaged", http.StatusBadRequest)
+				return
+			}
+			userData := new(authentication.User)
+			err = json.Unmarshal(c, userData)
+			if err != nil {
+				http.Error(w, "Cookie is damaged", http.StatusBadRequest)
+				return
+			}
+			if userData.Access < 1 {
+				http.Error(w, "Access denied", http.StatusUnauthorized)
+				return
+			}
+
+			targetID, _ := strconv.Atoi(r.FormValue("id"))
+			log.Printf("Target ID: %d\n", targetID)
+
+			result := DeleteFilm(targetID)
+			if result {
+				w.WriteHeader(http.StatusOK)
+			} else {
+				http.Error(w, "Delete failed", http.StatusInternalServerError)
+			}
+
+		} else {
+			http.Error(w, "Not allowed", http.StatusBadRequest)
+		}
+	}
+}
+
+func SortFilmsByRateHandler(f *Film) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodGet {
+			_, err := authentication.CookieCheker(w, r)
+			if err != nil {
+				http.Error(w, "Cookie is damaged", http.StatusBadRequest)
+				return
+			}
+
+			result := GetAllFilms()
+			result = SortFilmsByRate(result)
+
+			jsonData, err := json.Marshal(result)
+			if err != nil {
+				http.Error(w, "Server error", http.StatusInternalServerError)
+				return
+			}
+
+			w.Header().Set("Content-Type", "application/json")
+			w.Write(jsonData)
+
+		} else {
+			http.Error(w, "Not allowed", http.StatusBadRequest)
+		}
+	}
+}
+
+func SortFilmsByNameHandler(f *Film) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodGet {
+			_, err := authentication.CookieCheker(w, r)
+			if err != nil {
+				http.Error(w, "Cookie is damaged", http.StatusBadRequest)
+				return
+			}
+
+			result := GetAllFilms()
+			result = SortFilmsByName(result)
+
+			jsonData, err := json.Marshal(result)
+			if err != nil {
+				http.Error(w, "Server error", http.StatusInternalServerError)
+				return
+			}
+
+			w.Header().Set("Content-Type", "application/json")
+			w.Write(jsonData)
+
+		} else {
+			http.Error(w, "Not allowed", http.StatusBadRequest)
+		}
+	}
+}
+
+func SortFilmsByDateHandler(f *Film) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodGet {
+			_, err := authentication.CookieCheker(w, r)
+			if err != nil {
+				http.Error(w, "Cookie is damaged", http.StatusBadRequest)
+				return
+			}
+
+			result := GetAllFilms()
+			result = SortFilmsByDate(result)
+
+			jsonData, err := json.Marshal(result)
+			if err != nil {
+				http.Error(w, "Server error", http.StatusInternalServerError)
+				return
+			}
+
+			w.Header().Set("Content-Type", "application/json")
+			w.Write(jsonData)
 
 		} else {
 			http.Error(w, "Not allowed", http.StatusBadRequest)

@@ -134,7 +134,7 @@ func DeleteFilmDB(id int) (bool, error) {
 	return true, nil
 }
 
-func FindFilmByFragment(fragment string) (bool, *sql.Rows, error) {
+func FindFilmByFragmentDB(fragment string) (bool, *sql.Rows, error) {
 	db, err := DBconnection()
 	if err != nil {
 		return false, nil, err
@@ -142,7 +142,7 @@ func FindFilmByFragment(fragment string) (bool, *sql.Rows, error) {
 	defer db.Close()
 
 	res, err := db.Query(`
-		SELECT id, name, description, enterdate, rate, score FROM films
+		SELECT id, name, description, enterdate, rate, score, votes FROM films
 		WHERE name LIKE '%' || $1 || '%';`, fragment)
 	if err != nil {
 		log.Fatalf("Error occured %v", err)
@@ -201,14 +201,14 @@ func ChangeFilmInfoDB(id int, name, description string, enterdate time.Time, sco
 		score=  $5, 
 		votes= $6 
 		WHERE id = $7`,
-		name, description, enterdate, score/votes, score, votes, id)
+		name, description, enterdate, float64(score/votes), score, votes, id)
 	if err != nil {
 		fmt.Println("Error during setting new film data")
 		return false, err
 	}
 	fmt.Println(result)
 
-	DeleteFilmActers(id)
+	DeleteFilmActersDB(id)
 
 	for _, acterId := range acters {
 		_, err := db.Exec(`
@@ -221,7 +221,7 @@ func ChangeFilmInfoDB(id int, name, description string, enterdate time.Time, sco
 	return true, nil
 }
 
-func DeleteFilmActers(filmID int) (bool, error) {
+func DeleteFilmActersDB(filmID int) (bool, error) {
 	db, err := DBconnection()
 	if err != nil {
 		return false, err
@@ -229,8 +229,9 @@ func DeleteFilmActers(filmID int) (bool, error) {
 	defer db.Close()
 
 	res, err := db.Exec(`
-		DELETE FROM film_acters WHERE film_id =  $1`, filmID)
+		DELETE FROM film_acters WHERE film_id  =   $1`, filmID)
 	if err != nil {
+		fmt.Printf("Не удалось удалить %e\n", err)
 		return false, err
 	}
 	fmt.Println(res)

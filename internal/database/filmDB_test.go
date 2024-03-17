@@ -53,9 +53,9 @@ func TestAddNewFilmDB(t *testing.T) {
 */
 
 func TestFindFilmByFragment(t *testing.T) {
-	fragment := "Dri"
+	fragment := "Driv"
 
-	_, res, err := FindFilmByFragment(fragment)
+	_, res, err := FindFilmByFragmentDB(fragment)
 	if err != nil {
 		t.Fatalf("Did not  find %v", err)
 	}
@@ -66,11 +66,13 @@ func TestFindFilmByFragment(t *testing.T) {
 	var enterdateTmp time.Time
 	var rateTmp float64
 	var scoreTmp int
+	var votes int
 
 	for res.Next() {
-		res.Scan(&id, &nameTmp, &descriptionTmp, &enterdateTmp, &rateTmp, &scoreTmp)
+		res.Scan(&id, &nameTmp, &descriptionTmp, &enterdateTmp, &rateTmp, &scoreTmp, &votes)
 
 		fmt.Println("EXPECTED:  Driver", "\nGOT ", nameTmp)
+		fmt.Println(id, nameTmp, descriptionTmp, enterdateTmp, rateTmp, scoreTmp, votes)
 
 	}
 
