@@ -2,7 +2,6 @@ package film
 
 import (
 	"log"
-	"time"
 
 	"vk/internal/database"
 )
@@ -35,23 +34,4 @@ func GetAllFilms() []film {
 		arrFilms = append(arrFilms, *newFilm)
 	}
 	return arrFilms
-}
-
-func AddNewFilm(name, description string, enterdate time.Time, acters []int) (bool, error) {
-	result, err := database.AddNewFilmDB(name, description, enterdate, acters)
-	if err != nil {
-		log.Fatalf("Unexpected error during adding films %v", err)
-		return result, err
-	}
-	return result, nil
-}
-
-func ChangeFilmInfo(name, newName, newDescription string, newEnterdate time.Time, newScore int, changeName, changeDescription, changeEnterdate, changeScore bool) (bool, error) {
-	result, err := database.ChangeFilmInfoDB(name, newName, newDescription, newEnterdate, newScore, changeName, changeDescription, changeEnterdate, changeScore)
-	if err != nil {
-		log.Fatalf("Unexpected error during changing info %v", err)
-		return result, err
-	}
-
-	return result, nil
 }

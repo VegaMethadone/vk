@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"vk/internal/acter"
 	"vk/internal/authentication"
 )
 
@@ -11,6 +12,7 @@ func main() {
 
 	//used structers
 	user := authentication.User{}
+	actor := acter.Acter{}
 
 	//main page
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -22,8 +24,15 @@ func main() {
 	http.HandleFunc("/EnterUser", authentication.EnterUserHandler(&user))
 	http.HandleFunc("/ChangeUserData", authentication.ChangeUserDataHandler(&user))
 
-	// films & acters
+	// acters
+	http.HandleFunc("/AddActer", acter.AddNewActerHandler(&actor))
+	http.HandleFunc("/ChangeActerInfo", acter.ChangeActerInfoHandler(&actor))
+	http.HandleFunc("/DeleteActerInfo", acter.DeleteActerInfoHandler(&actor))
+	http.HandleFunc("/GetAllActers", acter.GetAllActersHandler(&actor))
 
+	// films
+
+	//Server
 	fmt.Println("Server is working  at http://127.0.0.1:8080")
 	//http://localhost:8080
 	err := http.ListenAndServe(":8080", nil)

@@ -1,40 +1,23 @@
 package acter
 
 import (
-	"errors"
+	"fmt"
 	"log"
+	"strings"
 	"time"
 
 	"vk/internal/database"
 )
 
-func (a *Acter) ChangeName(name string) error {
+func ParseTime(str string) time.Time {
+	layout := "2006-01-02"
 
-	a.Name = name
-	return nil
-}
-
-func (a *Acter) ChangeSex(sex string) error {
-	if sex != "male" && sex != "female" && sex != "" {
-		return errors.New("uncorrect input")
-	}
-	a.Sex = sex
-	return nil
-}
-
-func (a *Acter) ChangeDate(dateOfBirth string) error {
-	maket := "2006-01-02"
-	parsedDate, err := time.Parse(maket, dateOfBirth)
+	t, err := time.Parse(layout, str)
 	if err != nil {
-		log.Println(err)
-		return err
+		fmt.Println("Error during parsing  time:", err)
+		return time.Time{}
 	}
-
-	if parsedDate.After(time.Now()) {
-		return errors.New("uncorrect input")
-	}
-	a.DateOfBirth = parsedDate
-	return nil
+	return t
 }
 
 func GetAllActersList() []Acter {
@@ -62,4 +45,53 @@ func GetAllActersList() []Acter {
 		arrActers = append(arrActers, *newActer)
 	}
 	return arrActers
+}
+
+func AddNewActer(name, sex string, dateOfBirth time.Time) bool {
+	name = strings.ToLower(name)
+	sex = strings.ToLower(sex)
+
+	result, err := database.AddNewActerDB(name, sex, dateOfBirth)
+	if err != nil {
+		log.Fatalf("Error during adding new actor  %v", err)
+		return false
+	}
+
+	return result
+}
+
+func ChangeActerInfo(id int, name, sex string, dateOfBirth time.Time) bool {
+	name = strings.ToLower(name)
+	sex = strings.ToLower(sex)
+	if dateOfBirth.After(time.Now()) {
+		log.Fatalf("Incorrect date\n")
+		return false
+	}
+
+	_, err := database.FindActerByIdDB(id)
+	if err != nil {
+		log.Fatalf("Error during finding acter  %v", err)
+		return false
+	}
+
+	result, err := database.ChangeActerAllDB(id, name, sex, dateOfBirth)
+	if err != nil {
+		log.Fatalf("Database error %v", err)
+		return false
+	}
+	return result
+}
+
+func DeleteActer(id int) bool {
+	err := database.DeleteAllActerFilmsDB(id)
+	if err != nil {
+		return false
+	}
+
+	result, err := database.DeleteActerInfoDB(id)
+	if err != nil {
+		log.Fatalf("Database error")
+		return false
+	}
+	return result
 }
