@@ -35,6 +35,7 @@ func main() {
 	// films
 	http.HandleFunc("/AddFilm", film.AddNewFilmHandler(&newFilm))
 	http.HandleFunc("/GetAllFilms", film.GetAllFilmsHandler(&newFilm))
+	http.HandleFunc("/ChangeFilmInfo", film.ChangeFilmInfoHandler(&newFilm))
 
 	//Server
 	fmt.Println("Server is working  at http://127.0.0.1:8080")
