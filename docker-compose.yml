@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  server:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    links:
+      - database
+
+  database:
+    build:
+      context: ./configs/docker/db
+      dockerfile: Dockerfile 
+    ports:
+      - "5432:5432" 
+
+

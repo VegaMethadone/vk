@@ -7,7 +7,8 @@ import (
 	_ "github.com/lib/pq"
 )
 
-const connStr string = "user=postgres password=0000 dbname=testDB sslmode=disable"
+// const connStr string = "user=postgres password=0000 dbname=testDB sslmode=disable"
+const connStr string = "user=postgres password=0000 dbname=testDB sslmode=disable host=database"
 
 func DBconnection() (*sql.DB, error) {
 	db, err := sql.Open("postgres", connStr)
