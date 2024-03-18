@@ -3,6 +3,7 @@ package authentication
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 )
@@ -14,7 +15,10 @@ func RegistrationHandler(u *User) http.HandlerFunc {
 			accessStr := r.FormValue("access")
 			tmpAccess, err := strconv.Atoi(accessStr)
 			if err != nil {
-				http.Error(w, "Invalid access value", http.StatusBadRequest)
+				errorMessage := "Invalid access value"
+				log.Println(errorMessage)
+				w.WriteHeader(http.StatusBadRequest)
+				w.Write([]byte(errorMessage))
 				return
 			}
 
@@ -27,14 +31,24 @@ func RegistrationHandler(u *User) http.HandlerFunc {
 
 			result := newUser.CreateUser(newUser.Login, newUser.Password, newUser.Access)
 			if result {
+				message := "Successful registration"
+				log.Println(message, newUser.Login, newUser.Access)
 				w.WriteHeader(http.StatusCreated)
 				fmt.Fprintf(w, "Successful registration\n")
 			} else {
-				http.Error(w, "Registration failed", http.StatusInternalServerError)
+				errorMessage := "Registration  failed"
+				log.Println(errorMessage)
+				w.WriteHeader(http.StatusInternalServerError)
+				w.Write([]byte(errorMessage))
+				return
 			}
 
 		} else {
-			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+			errorMessage := "NotAllowed"
+			log.Println(errorMessage)
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			w.Write([]byte(errorMessage))
+			return
 		}
 	}
 
@@ -53,7 +67,10 @@ func EnterUserHandler(u *User) http.HandlerFunc {
 			if result {
 				userJSON, err := json.Marshal(foundUser)
 				if err != nil {
-					http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+					errorMessage := "Json Marshal Error  during authorization"
+					log.Println(errorMessage)
+					w.WriteHeader(http.StatusInternalServerError)
+					w.Write([]byte(errorMessage))
 					return
 				}
 
@@ -62,12 +79,18 @@ func EnterUserHandler(u *User) http.HandlerFunc {
 
 				fmt.Fprintf(w, "Successfuly found\n")
 			} else {
-				http.Error(w, "failed", http.StatusNotFound)
+				errorMessage := "Faild authorization"
+				log.Println(errorMessage)
+				w.WriteHeader(http.StatusInternalServerError)
+				w.Write([]byte(errorMessage))
 				return
 			}
 
 		} else {
-			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+			errorMessage := "NotAllowed"
+			log.Println(errorMessage)
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			w.Write([]byte(errorMessage))
 			return
 		}
 	}
@@ -76,10 +99,13 @@ func EnterUserHandler(u *User) http.HandlerFunc {
 
 func ChangeUserDataHandler(u *User) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == http.MethodPost {
+		if r.Method == http.MethodPut {
 			c, err := r.Cookie("session_token")
 			if err != nil {
-				http.Error(w, "Not log in", http.StatusBadRequest)
+				errorMessage := "No cookie"
+				log.Println(errorMessage)
+				w.WriteHeader(http.StatusBadRequest)
+				w.Write([]byte(errorMessage))
 				return
 			}
 
@@ -98,25 +124,35 @@ func ChangeUserDataHandler(u *User) http.HandlerFunc {
 
 			result, _ := newUser.ChangeUserData(newUser.Id, newUser.Access, newUser.Login, newUser.Password)
 			if !result {
-				http.Error(w, "Server  error\n", http.StatusInternalServerError)
+				errorMessage := "Server error during  changing user data"
+				log.Println(errorMessage)
+				w.WriteHeader(http.StatusInternalServerError)
+				w.Write([]byte(errorMessage))
 				return
+
 			} else {
 				newJson, err := json.Marshal(newUser)
 				if err != nil {
-					http.Error(w, "Error during Marshal JSON\n", http.StatusInternalServerError)
+					errorMessage := "Json Marshal Error  during authorization"
+					log.Println(errorMessage)
+					w.WriteHeader(http.StatusInternalServerError)
+					w.Write([]byte(errorMessage))
 					return
 				}
-				fmt.Printf("New JSON:  %v\n", string(newJson))
 
 				token := base64Encode(newJson)
-				fmt.Printf("New token: %s\n", token)
+				log.Printf("New token: %s\n", token)
 
 				CookieSeter(w, r, token)
 
 			}
 
 		} else {
-			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+			errorMessage := "NotAllowed"
+			log.Println(errorMessage)
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			w.Write([]byte(errorMessage))
+			return
 		}
 	}
 

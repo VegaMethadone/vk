@@ -30,13 +30,13 @@ func CookieSeter(w http.ResponseWriter, r *http.Request, token string) {
 func CookieCheker(w http.ResponseWriter, r *http.Request) ([]byte, error) {
 	c, err := r.Cookie("session_token")
 	if err != nil {
-		log.Fatalf("Cookie is damaged %v", err)
+		log.Printf("Cookie is damaged %v", err)
 		return nil, err
 	}
 
 	token, err := base64Decode(c.Value)
 	if err != nil {
-		log.Fatalf("Cookie is damaged %v", err)
+		log.Printf("Error during decoding %v", err)
 		return nil, err
 	}
 

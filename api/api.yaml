@@ -1,0 +1,711 @@
+openapi: 3.0.3
+info:
+  title: Swagger Petstore - OpenAPI 3.0
+  description:  |-
+    Спецификация API для VK TECH
+  version: 1.0.0
+
+tags:
+  - name: user
+    description: Регистрация и авторизация
+  - name: acter
+    description: Добавление, изменение, удаление и выборка
+  - name: film
+    description: Добавление, изменение, удаление и выборка
+
+paths:
+  /user/UserRegistration:
+    post:
+      tags:
+        - user
+      summary: Добавление пользователя
+      description: Добавление пользователя с указанными данными
+      operationId: UserRegistration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegistration'
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Wrong Data
+        '405':
+          description: Method Not Allowed
+        '500':
+          description: Server Error
+
+  /user/EnterUser:
+    post:
+      tags:
+        - user
+      summary: Авторизация пользователя
+      description: Авторизация, получение cookie
+      operationId: EnterUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnterUser'
+      responses:
+        '200':
+          description: Successful operation
+          headers:
+            Set-Cookie:
+              description: 0JfQsNC60L7QtNC40YDQvtCy0LDQvdC90YvQtSDQutGD0LrQuA==
+              schema:
+                type: string
+        '405':
+          description: Method Not Allowed
+        '500':
+          description: Server Error
+
+  /user/ChangeUserData:
+    put:
+      tags:
+        - user
+      summary: Проверка куки и изменение данных о себе
+      operationId: ChangeUserData
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangeUserData'
+      responses:
+        '200':
+          description: Successful operation
+          headers:
+            Set-Cookie:
+              description: 0JfQsNC60L7QtNC40YDQvtCy0LDQvdC90YvQtSDQutGD0LrQuA==
+              schema:
+                type: string
+        '405':
+          description: Method Not Allowed
+        '500':
+          description: Server Error
+
+  /acter/AddActer:
+    post:
+      tags:
+        - acter
+      summary:  Добавление данных  об актере
+      operationId: AddActer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddActer'
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Wrong Data
+        '405':
+          description: Method Not Allowed
+        '500':
+          description: Server Error
+  
+  /acter/ChangeActerInfo:
+    put:
+      tags:
+        - acter
+      summary:  Изменение данных об актере
+      operationId: ChangeActerInfo
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangeActerInfo'
+      parameters:
+      - name: session_token
+        in: header
+        description: Куки пользователя
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Wrong Data
+        '405':
+          description: Method Not Allowed
+        '500':
+          description: Server Error
+  
+  /acter/DeleteActerInfo:
+    delete:
+      tags:
+        - acter
+      summary: Удаление  данных об актере
+      operationId: DeleteActerInfo
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteActerInfo'
+      parameters:
+      - name: session_token
+        in: header
+        description: Куки пользователя
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Wrong Data
+        '405':
+          description: Method Not Allowed
+        '500':
+          description: Server Error
+
+  /acter/GetAllActers:
+    get:
+      tags:
+        - acter
+      summary: Получние списка актеров с фильмами
+      operationId: GetAllActers
+      parameters:
+      - name: session_token
+        in: header
+        description: Куки пользователя
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetAllActers'
+
+        '405':
+          description: Method Not Allowed
+        '500':
+          description: Server Error
+
+  /films/AddFilm:
+    post:
+      tags:
+        - film
+      summary: Добавление фильма  и актеров, которые в нём  играли
+      operationId: AddFilm
+      parameters:
+      - name: session_token
+        in: header
+        description: Куки пользователя
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddFilm'
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Wrong Data
+        '405':
+          description: Method Not Allowed
+        '500':
+          description: Server Error
+
+  /films/GetAllFilms:
+    get:
+      tags:
+        - film
+      summary: Получние списка фильмов с актерами
+      operationId: GetAllFilms
+      parameters:
+      - name: session_token
+        in: header
+        description: Куки пользователя
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetAllFilms'
+
+        '405':
+          description: Method Not Allowed
+        '500':
+          description: Server Error
+
+  /films/ChangeFilmInfo:
+      put:
+        tags:
+          - film
+        summary: Изменение  информации о фильме
+        operationId: ChangeFilmInfo
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChangeFilmInfo'
+        parameters:
+        - name: session_token
+          in: header
+          description: Куки пользователя
+          required: true
+          schema:
+            type: string
+        responses:
+          '200':
+            description: Successful operation
+          '400':
+            description: Wrong Data
+          '405':
+            description: Method Not Allowed
+          '500':
+            description: Server Error
+
+
+  /films/GetFilmByFragement:
+    get:
+      tags:
+        - film
+      summary: Поиск фильма по фрагменту
+      operationId: GetFilmByFragement
+      requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetFilmByFragement'
+      parameters:
+        - name: session_token
+          in: header
+          description: Куки пользователя
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetAllFilms'
+
+        '405':
+          description: Method Not Allowed
+        '500':
+          description: Server Error
+
+  /films/DeleteFilm:
+      delete:
+        tags:
+          - film
+        summary: Изменение  информации о фильме
+        operationId: DeleteFilm
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteFilm'
+        parameters:
+        - name: session_token
+          in: header
+          description: Куки пользователя
+          required: true
+          schema:
+            type: string
+        responses:
+          '200':
+            description: Successful operation
+          '400':
+            description: Wrong Data
+          '405':
+            description: Method Not Allowed
+          '500':
+            description: Server Error
+
+
+  /films/GetFilmsByRate:
+    get:
+      tags:
+        - film
+      summary: Поиск фильма по фрагменту
+      operationId: GetFilmsByRate
+      parameters:
+        - name: session_token
+          in: header
+          description: Куки пользователя
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetAllFilms'
+
+        '405':
+          description: Method Not Allowed
+        '500':
+          description: Server Error
+
+  /films/GetFilmsByName:
+    get:
+      tags:
+        - film
+      summary: Поиск фильма по фрагменту
+      operationId: GetFilmsByName
+      parameters:
+        - name: session_token
+          in: header
+          description: Куки пользователя
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetAllFilms'
+
+        '405':
+          description: Method Not Allowed
+        '500':
+          description: Server Error
+
+  /films/GetFilmsByDate:
+    get:
+      tags:
+        - film
+      summary: Поиск фильма по фрагменту
+      operationId: GetFilmsByDate
+      parameters:
+        - name: session_token
+          in: header
+          description: Куки пользователя
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetAllFilms'
+
+        '405':
+          description: Method Not Allowed
+        '500':
+          description: Server Error
+
+components:
+  securitySchemes:
+    cookieAuth:
+      name: session_token
+      type: apiKey
+      in: cookie
+    
+  schemas:
+    UserRegistration:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Всегда 0 т.к. бд сама проставит
+          example: 0
+        name:
+          type: string
+          description: Имя пользователя
+          example: Putin
+        password:
+          type: string
+          description: Пароль пользователя
+          example: qwerty1234
+        access:
+          type: integer
+          description: Уровень доступа пользователя (0  - только чтение)
+          example: 2
+      required:
+        - name
+        - password
+        - access
+
+    EnterUser:
+      type: object
+      properties:
+        login:
+          type: string
+          description: Имя пользователя
+          example: Putin
+        password:
+          type: string
+          description: Пароль пользователя
+          example: qwerty1234
+      required:
+        - login
+        - password
+
+    ChangeUserData:
+      type:  object
+      properties:
+        login:
+          type: string
+          description: Имя пользователя
+          example: Cringe
+        password:
+          type: string
+          description: Пароль пользователя
+          example: 1234qwerty
+      required:
+        - login
+        - password
+
+
+    AddActer:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Имя Фималияи актера
+          example: Ryan Gosling
+        sex:
+          type: string
+          description: Пол актера 
+          example: male
+        date:
+          type: string
+          format: date-time  
+          description: Дата рождения
+          example: 1980-11-12
+      required:
+        - name
+        - sex
+        - date
+
+    ChangeActerInfo:
+      type: object
+      properties:
+        id:
+          type: string
+          description: id актера 
+          example: 1
+        name:
+          type: string
+          description: Имя Фималияи актера
+          example: Ryan Gosling
+        sex:
+          type: string
+          description: Пол актера 
+          example: male
+        date:
+          type: string
+          format: date-time  
+          description: Дата рождения
+          example: 1980-11-12
+      required:
+          - id
+          - name
+          - sex
+          - date
+
+
+    DeleteActerInfo:
+      type: object
+      properties:
+        id:
+          type: string
+          description: id актера 
+          example: 1
+      required:
+          - id
+
+    GetAllActers:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Уникальный идентификатор актера
+          example:  1
+        name:
+          type: string
+          description: Имя актера
+          example:  Ryan Gosling
+        sex:
+          type: string
+          description: Пол актера
+          example: male
+        date:
+          type: string
+          format: date-time
+          description: Дата рождения актера
+          example:  1980-11-12
+        films:
+          type: array
+          items:
+            type: integer
+          description: Список идентификаторов фильмов, в которых снимался актер
+          example: [1, 2, 3]
+
+
+    AddFilm:
+      type: object
+      properties:
+        name:
+          type:  string
+          description: Название фильма
+          example: Drive
+        description:
+          type: string
+          description: Описание фильма  не больше 1000
+          example: A great driver – in the light of day he performs stunt stunts on Hollywood film sets, and at night he plays a risky game. But one dangerous contract – and there is a reward for his life. Now, in order to stay alive and save his charming neighbor, he must do what he knows best – masterfully evade the chase.
+        enterdate:
+          type: string
+          format: date-time  
+          description: дата выхода фильма
+          example: 1980-11-12
+        acters:
+          type: array
+          items:
+            type: integer
+          description: Список идентификаторов актеров, которые  играли в фильме
+          example: [1, 2, 3]
+      required:
+        - name
+        - description
+        - enterdate
+        - acters 
+
+    GetAllFilms:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Уникальный идентификатор актера
+          example:  1
+        name:
+          type: string
+          description: Название фильма
+          example:  Drive
+        description:
+          type: string
+          description: Описание фильма
+          example: A brilliant driver - by day he performs stunt tricks on Hollywood movie sets, and by night he leads a risky game. But one dangerous contract - and a reward is put on his life. Now, to stay alive and save his charming neighbor, he must do what he does best - skillfully evade pursuit.
+        enterdate:
+          type: string
+          format: date-time
+          description: Дата рождения актера
+          example:  2011-05-20
+        rate:
+          type:   integer
+          description: Рейтинг фильма
+          example:  7.5
+        score:
+          type: integer
+          description: Сколько всего баллов набрал фильм
+          example: 75
+        votes: 
+          type: integer
+          description: Сколько всего  голосовало
+          example: 10
+        acters:
+          type: array
+          items:
+            type: integer
+          description: Список идентификаторов актеров, которые снялись в фильме
+          example: [1, 2, 3]
+
+    ChangeFilmInfo:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Уникальный идентификатор актера
+          example:  1
+        name:
+          type: string
+          description: Название фильма
+          example:  Drive
+        description:
+          type: string
+          description: Описание фильма
+          example: A brilliant driver - by day he performs stunt tricks on Hollywood movie sets, and by night he leads a risky game. But one dangerous contract - and a reward is put on his life. Now, to stay alive and save his charming neighbor, he must do what he does best - skillfully evade pursuit.
+        enterdate:
+          type: string
+          format: date-time
+          description: Дата рождения актера
+          example:  2011-05-20
+        score:
+          type: integer
+          description: Сколько всего баллов набрал фильм
+          example: 75
+        votes: 
+          type: integer
+          description: Сколько всего  голосовало
+          example: 10
+        acters:
+          type: array
+          items:
+            type: integer
+          description: Список идентификаторов актеров, которые снялись в фильме
+          example: [1, 2, 3]
+      required:
+        - id
+        - name
+        - description
+        - enterdate
+        - score
+        - votes
+        - acters
+
+    GetFilmByFragement:
+      type:  object
+      properties:
+        name:
+          type: string
+          description: Название фильма
+          example: Dri 
+      required:
+        - name
+    
+    DeleteFilm:
+      type: object
+      properties:
+        id:
+          type: integer
+          description:  ID фильма
+          example: 1
+      required:
+        - id

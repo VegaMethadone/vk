@@ -1,7 +1,6 @@
 package acter
 
 import (
-	"fmt"
 	"log"
 	"strings"
 	"time"
@@ -14,7 +13,7 @@ func ParseTime(str string) time.Time {
 
 	t, err := time.Parse(layout, str)
 	if err != nil {
-		fmt.Println("Error during parsing  time:", err)
+		log.Println("Error during parsing  time:", err)
 		return time.Time{}
 	}
 	return t
@@ -25,7 +24,8 @@ func GetAllActersList() []Acter {
 
 	res, err := database.GetAllActersDB()
 	if err != nil {
-		log.Fatalf("Did not get acters from DB %v\n", err)
+		log.Printf("Did not get acters from DB %v\n", err)
+		return nil
 	}
 
 	for res.Next() {
@@ -34,7 +34,7 @@ func GetAllActersList() []Acter {
 
 		films, err := database.GetALLActerFilmsDB(newActer.Id)
 		if err != nil {
-			log.Fatalf("Did not get acter films from DB %v\n", err)
+			log.Printf("Did not get acter films from DB %v\n", err)
 		}
 
 		for films.Next() {
@@ -53,7 +53,7 @@ func AddNewActer(name, sex string, dateOfBirth time.Time) bool {
 
 	result, err := database.AddNewActerDB(name, sex, dateOfBirth)
 	if err != nil {
-		log.Fatalf("Error during adding new actor  %v", err)
+		log.Printf("Error during adding new actor  %v", err)
 		return false
 	}
 
@@ -64,19 +64,19 @@ func ChangeActerInfo(id int, name, sex string, dateOfBirth time.Time) bool {
 	name = strings.ToLower(name)
 	sex = strings.ToLower(sex)
 	if dateOfBirth.After(time.Now()) {
-		log.Fatalf("Incorrect date\n")
+		log.Printf("Incorrect date\n")
 		return false
 	}
 
 	_, err := database.FindActerByIdDB(id)
 	if err != nil {
-		log.Fatalf("Error during finding acter  %v", err)
+		log.Printf("Error during finding acter  %v", err)
 		return false
 	}
 
 	result, err := database.ChangeActerAllDB(id, name, sex, dateOfBirth)
 	if err != nil {
-		log.Fatalf("Database error %v", err)
+		log.Printf("Database error %v", err)
 		return false
 	}
 	return result
@@ -90,7 +90,7 @@ func DeleteActer(id int) bool {
 
 	result, err := database.DeleteActerInfoDB(id)
 	if err != nil {
-		log.Fatalf("Database error")
+		log.Printf("Database error")
 		return false
 	}
 	return result

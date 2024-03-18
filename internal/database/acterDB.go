@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"time"
 )
 
@@ -20,7 +21,7 @@ func AddNewActerDB(name, sex string, dateOfBirth time.Time) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	fmt.Println(res)
+	log.Println("Added new acter db", res)
 	return true, nil
 
 }
@@ -40,7 +41,7 @@ func FindActerDB(name string) (bool, *sql.Rows, error) {
 	if err != nil {
 		return false, nil, err
 	}
-	//fmt.Println(res)
+	log.Println("Found acter db:", res)
 	return true, res, nil
 
 }
@@ -60,7 +61,7 @@ func ChangeActerNameDB(id int, name string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	fmt.Println(res)
+	log.Println("Changed acter name db:", res)
 	return true, nil
 }
 
@@ -98,7 +99,7 @@ func ChangeActerDateOfBirthDB(id int, date time.Time) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	fmt.Println(res)
+	log.Println("Changed acter date DB", res)
 	return true, nil
 }
 
@@ -119,7 +120,7 @@ func ChangeActerAllDB(id int, name, sex string, date time.Time) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	fmt.Println(res)
+	log.Println("Changed acter info DB", res)
 	return true, nil
 }
 
@@ -137,7 +138,7 @@ func DeleteActerInfoDB(id int) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	fmt.Println(res)
+	log.Println("Deleted  acter info DB:", res)
 	return true, nil
 }
 
@@ -189,7 +190,7 @@ func FindActerByIdDB(id int) (*sql.Rows, error) {
 	if err != nil {
 		return nil, err
 	}
-	//fmt.Println(res)
+	log.Println("Found acter  db by ID:", res)
 	return res, nil
 
 }

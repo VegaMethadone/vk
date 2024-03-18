@@ -1,7 +1,6 @@
 package film
 
 import (
-	"fmt"
 	"log"
 	"strings"
 	"time"
@@ -14,7 +13,7 @@ func GetAllFilms() []Film {
 
 	res, err := database.GetAllFilmsDB()
 	if err != nil {
-		log.Fatalf("Unexpected error during getting films %v", err)
+		log.Printf("Unexpected error during getting films %v", err)
 		return nil
 	}
 
@@ -25,7 +24,7 @@ func GetAllFilms() []Film {
 
 		acters, err := database.GetAllFilmActersDB(newFilm.Id)
 		if err != nil {
-			log.Fatalf("Unexpected error during getting films %v", err)
+			log.Printf("Unexpected error during getting films %v", err)
 			return nil
 		}
 
@@ -44,6 +43,7 @@ func AddNewFilm(name, description string, enterdate time.Time, acters []int) boo
 
 	result, err := database.AddNewFilmDB(name, description, enterdate, acters)
 	if err != nil {
+		log.Println("Error occured during AddNewFilmDB:", err)
 		return false
 	}
 	return result
@@ -53,6 +53,7 @@ func ChangeFilmInfo(id int, name, description string, enterdate time.Time, score
 	newName := strings.ToLower(name)
 	result, err := database.ChangeFilmInfoDB(id, newName, description, enterdate, score, votes, acters)
 	if err != nil {
+		log.Println("Error occured during ChangeFilmInfoDB:", err)
 		return false
 	}
 
@@ -75,7 +76,7 @@ func GetFilmByFragment(fragment string) []Film {
 
 		acters, err := database.GetAllFilmActersDB(film.Id)
 		if err != nil {
-			fmt.Println("Error occurred", err)
+			log.Println("Error occurred GetAllFilmActersDB:", err)
 		}
 		for acters.Next() {
 			var acterId int
@@ -92,7 +93,7 @@ func DeleteFilm(id int) bool {
 
 	res, err := database.DeleteFilmDB(id)
 	if err != nil {
-		fmt.Println("Error occurred", err)
+		log.Println("Error occurred DeleteFilmDB:", err)
 		return false
 	}
 	return res
