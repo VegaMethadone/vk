@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Swagger Petstore - OpenAPI 3.0
   description:  |-
-    Спецификация API для VK TECH
+    Спецификация API для VK TECH. В  некоторых запросах get & delete есть body. Сомнительно, но ОКЭЙ
   version: 1.0.0
 
 tags:

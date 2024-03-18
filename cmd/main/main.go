@@ -35,7 +35,7 @@ func main() {
 	newFilm := film.Film{}
 
 	//main page
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/home", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Server is working!")
 	})
 
