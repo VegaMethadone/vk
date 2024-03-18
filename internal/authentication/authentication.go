@@ -1,7 +1,6 @@
 package authentication
 
 import (
-	"fmt"
 	"log"
 	"strings"
 
@@ -20,12 +19,14 @@ func findSubstring(str, target string) bool {
 
 func (u *User) CreateUser(login, password string, access int) bool {
 	if findSubstring(login, "drop") || findSubstring(password, "drop") {
+		log.Println("found a forbidden string - Creaue User")
 		return false
 	}
 
 	result, err := database.NewUserDB(login, password, access)
 	if err != nil {
-		log.Fatalf("Error occurred during registration %v", err)
+		log.Printf("Error occurred during registration %v", err)
+		return false
 	}
 	return result
 }
@@ -33,7 +34,7 @@ func (u *User) CreateUser(login, password string, access int) bool {
 func (u *User) FindUser(login, password string) (bool, *User) {
 	_, userData, err := database.FindUserDB(login, password)
 	if err != nil {
-		log.Fatalf("Error occurred during finding user %v", err)
+		log.Printf("Error occurred during finding user %v", err)
 		return false, nil
 	}
 
@@ -45,6 +46,7 @@ func (u *User) FindUser(login, password string) (bool, *User) {
 	}
 
 	if foundUser.Login == login && foundUser.Password == password {
+		log.Println("Found user:", login)
 		return true, foundUser
 	}
 
@@ -54,7 +56,7 @@ func (u *User) FindUser(login, password string) (bool, *User) {
 func (u *User) ChangeUserData(id, access int, login, password string) (bool, *User) {
 	result, err := database.ChangePasswordOrLoginDB(login, password, access, id)
 	if err != nil {
-		log.Fatalf("Unexpected error uccurred during user changing %v", err)
+		log.Printf("Unexpected error uccurred during user changing %v", err)
 		return false, nil
 	}
 	newUser := &User{
@@ -63,7 +65,7 @@ func (u *User) ChangeUserData(id, access int, login, password string) (bool, *Us
 		Password: password,
 		Access:   access,
 	}
-	fmt.Println(newUser)
+	log.Println(newUser)
 
 	return result, newUser
 }

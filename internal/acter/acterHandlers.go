@@ -2,7 +2,7 @@ package acter
 
 import (
 	"encoding/json"
-	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -15,17 +15,26 @@ func AddNewActerHandler(a *Acter) http.HandlerFunc {
 		if r.Method == http.MethodPost {
 			c, err := authentication.CookieCheker(w, r)
 			if err != nil {
-				http.Error(w, "Cookie is damaged", http.StatusBadRequest)
+				errorMessage := "Cookie is damaged"
+				log.Println(errorMessage)
+				w.WriteHeader(http.StatusBadRequest)
+				w.Write([]byte(errorMessage))
 				return
 			}
 			userData := new(authentication.User)
 			err = json.Unmarshal(c, userData)
 			if err != nil {
-				http.Error(w, "Cookie is damaged", http.StatusBadRequest)
+				errorMessage := "Json is damaged"
+				log.Println(errorMessage)
+				w.WriteHeader(http.StatusBadRequest)
+				w.Write([]byte(errorMessage))
 				return
 			}
 			if userData.Access < 1 {
-				http.Error(w, "Access denied", http.StatusUnauthorized)
+				errorMessage := "Access denied"
+				log.Println(errorMessage)
+				w.WriteHeader(http.StatusInternalServerError)
+				w.Write([]byte(errorMessage))
 				return
 			}
 
@@ -38,37 +47,55 @@ func AddNewActerHandler(a *Acter) http.HandlerFunc {
 
 			result, err := database.AddNewActerDB(newActer.Name, newActer.Sex, newActer.DateOfBirth)
 			if err != nil {
-				http.Error(w, "Server  error", http.StatusInternalServerError)
+				errorMessage := "Server error during adding new acter"
+				log.Println(errorMessage, newActer.Name, newActer.Name, newActer.DateOfBirth, newActer.Films)
+				w.WriteHeader(http.StatusInternalServerError)
+				w.Write([]byte(errorMessage))
 				return
 			}
 
 			if result {
+				log.Println("Added new acter")
 				w.WriteHeader(http.StatusOK)
 			} else {
+				log.Println("Error adding new acter")
 				w.WriteHeader(http.StatusInternalServerError)
 			}
 		} else {
-			http.Error(w, "Not allowed", http.StatusBadRequest)
+			errorMessage := "NotAllowed"
+			log.Println(errorMessage)
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			w.Write([]byte(errorMessage))
+			return
 		}
 	}
 }
 
 func ChangeActerInfoHandler(a *Acter) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == http.MethodPost {
+		if r.Method == http.MethodPut {
 			c, err := authentication.CookieCheker(w, r)
 			if err != nil {
-				http.Error(w, "Cookie is damaged", http.StatusBadRequest)
+				errorMessage := "Cookie is damaged"
+				log.Println(errorMessage)
+				w.WriteHeader(http.StatusBadRequest)
+				w.Write([]byte(errorMessage))
 				return
 			}
 			userData := new(authentication.User)
 			err = json.Unmarshal(c, userData)
 			if err != nil {
-				http.Error(w, "Cookie is damaged", http.StatusBadRequest)
+				errorMessage := "Json is damaged"
+				log.Println(errorMessage)
+				w.WriteHeader(http.StatusBadRequest)
+				w.Write([]byte(errorMessage))
 				return
 			}
 			if userData.Access < 1 {
-				http.Error(w, "Access denied", http.StatusUnauthorized)
+				errorMessage := "NotAllowed"
+				log.Println(errorMessage)
+				w.WriteHeader(http.StatusBadRequest)
+				w.Write([]byte(errorMessage))
 				return
 			}
 
@@ -83,33 +110,48 @@ func ChangeActerInfoHandler(a *Acter) http.HandlerFunc {
 
 			result := ChangeActerInfo(updateActer.Id, updateActer.Name, updateActer.Sex, updateActer.DateOfBirth)
 			if result {
+				log.Println("Successfully changed acter")
 				w.WriteHeader(http.StatusAccepted)
 			} else {
+				log.Println("Error change  info  acter")
 				w.WriteHeader(http.StatusInternalServerError)
 			}
 
 		} else {
-			http.Error(w, "Not allowed", http.StatusBadRequest)
+			errorMessage := "NotAllowed"
+			log.Println(errorMessage)
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			w.Write([]byte(errorMessage))
+			return
 		}
 	}
 }
 
 func DeleteActerInfoHandler(a *Acter) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == http.MethodPost {
+		if r.Method == http.MethodDelete {
 			c, err := authentication.CookieCheker(w, r)
 			if err != nil {
-				http.Error(w, "Cookie is damaged", http.StatusBadRequest)
+				errorMessage := "Cookie is damaged"
+				log.Println(errorMessage)
+				w.WriteHeader(http.StatusBadRequest)
+				w.Write([]byte(errorMessage))
 				return
 			}
 			userData := new(authentication.User)
 			err = json.Unmarshal(c, userData)
 			if err != nil {
-				http.Error(w, "Cookie is damaged", http.StatusBadRequest)
+				errorMessage := "Json is damaged"
+				log.Println(errorMessage)
+				w.WriteHeader(http.StatusBadRequest)
+				w.Write([]byte(errorMessage))
 				return
 			}
 			if userData.Access < 1 {
-				http.Error(w, "Access denied", http.StatusUnauthorized)
+				errorMessage := "NotAllowed"
+				log.Println(errorMessage)
+				w.WriteHeader(http.StatusBadRequest)
+				w.Write([]byte(errorMessage))
 				return
 			}
 
@@ -117,13 +159,19 @@ func DeleteActerInfoHandler(a *Acter) http.HandlerFunc {
 
 			result := DeleteActer(acterId)
 			if result {
+				log.Println("Acter Id:", acterId, "Deleted")
 				w.WriteHeader(http.StatusOK)
 			} else {
+				log.Println("Acter Id:", acterId, "Error  delete")
 				w.WriteHeader(http.StatusInternalServerError)
 			}
 
 		} else {
-			http.Error(w, "Not allowed", http.StatusBadRequest)
+			errorMessage := "NotAllowed"
+			log.Println(errorMessage)
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			w.Write([]byte(errorMessage))
+			return
 		}
 	}
 }
@@ -133,26 +181,34 @@ func GetAllActersHandler(a *Acter) http.HandlerFunc {
 		if r.Method == http.MethodGet {
 			_, err := authentication.CookieCheker(w, r)
 			if err != nil {
-				http.Error(w, "Cookie is damaged", http.StatusBadRequest)
+				errorMessage := "Cookie is damaged"
+				log.Println(errorMessage)
+				w.WriteHeader(http.StatusMethodNotAllowed)
+				w.Write([]byte(errorMessage))
 				return
 			}
 
 			result := GetAllActersList()
-			fmt.Println("RESULT: ", result)
+			log.Println("RESULT: ", result)
 
 			jsonData, err := json.Marshal(result)
-			//COMMENT
-			fmt.Println("JSON DATA:", string(jsonData))
-			//COMMENT
+			log.Println("JSON DATA:", string(jsonData))
 			if err != nil {
-				http.Error(w, "Server error", http.StatusInternalServerError)
+				errorMessage := "Json is damaged"
+				log.Println(errorMessage)
+				w.WriteHeader(http.StatusInternalServerError)
+				w.Write([]byte(errorMessage))
 				return
 			}
 
 			w.Header().Set("Content-Type", "application/json")
 			w.Write(jsonData)
 		} else {
-			http.Error(w, "Not allowed", http.StatusBadRequest)
+			errorMessage := "NotAllowed"
+			log.Println(errorMessage)
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			w.Write([]byte(errorMessage))
+			return
 		}
 	}
 }

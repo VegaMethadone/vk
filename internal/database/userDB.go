@@ -2,7 +2,7 @@ package database
 
 import (
 	"database/sql"
-	"fmt"
+	"log"
 )
 
 func NewUserDB(login, password string, access int) (bool, error) {
@@ -19,7 +19,7 @@ func NewUserDB(login, password string, access int) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	fmt.Println(res)
+	log.Println(res)
 	return true, nil
 }
 
@@ -58,6 +58,6 @@ func ChangePasswordOrLoginDB(login, password string, access, id int) (bool, erro
 	if err != nil {
 		return false, err
 	}
-	fmt.Println(res)
+	log.Println(res)
 	return true, nil
 }

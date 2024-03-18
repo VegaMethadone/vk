@@ -2,7 +2,6 @@ package database
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"time"
 )
@@ -22,13 +21,13 @@ func AddNewFilmDB(name, description string, enterdate time.Time, acters []int) (
 		INSERT INTO films (name, description, enterdate, rate, score, votes) VALUES ($1, $2, $3, $4, $5, $6)`,
 		name, description, enterdate, rate, score, votes)
 	if err != nil {
-		fmt.Println("Error duing inserting")
+		log.Println("Error duing inserting")
 		return false, err
 	}
 
 	_, film, err := FindFilmDB(name)
 	if err != nil {
-		fmt.Println("Error during finding film")
+		log.Println("Error during finding film")
 		return false, err
 	}
 	var filmID int
@@ -37,26 +36,23 @@ func AddNewFilmDB(name, description string, enterdate time.Time, acters []int) (
 		film.Scan(&filmID, &name, &description, &enterdate, &rate, &score, &votes)
 	}
 
-	//PRINT FILM ID
-	fmt.Println("Film ID:", filmID)
+	log.Println("Film ID:", filmID)
 
 	for _, acterID := range acters {
 		_, err = FindActerByIdDB(acterID)
 		if err != nil {
 			continue
 		} else {
-			//COMMENT
-			fmt.Println("Found acter id,", acterID)
-			//COMMENT
+			log.Println("Found acter id,", acterID)
 			res, err := db.Exec(`
 				INSERT INTO film_acters (film_id, acter_id) VALUES ($1, $2)`, filmID, acterID)
 			if err != nil {
 				return false, err
 			}
-			fmt.Println(res)
+			log.Println(res)
 		}
 	}
-	fmt.Println(res)
+	log.Println(res)
 	return true, nil
 }
 
@@ -130,7 +126,7 @@ func DeleteFilmDB(id int) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	fmt.Println(res)
+	log.Println(res)
 	return true, nil
 }
 
@@ -145,10 +141,10 @@ func FindFilmByFragmentDB(fragment string) (bool, *sql.Rows, error) {
 		SELECT id, name, description, enterdate, rate, score, votes FROM films
 		WHERE name LIKE '%' || $1 || '%';`, fragment)
 	if err != nil {
-		log.Fatalf("Error occured %v", err)
+		log.Printf("Error occured %v", err)
 	}
 
-	fmt.Println(res)
+	log.Println(res)
 	return true, res, nil
 
 }
@@ -163,7 +159,7 @@ func GetAllFilmsDB() (*sql.Rows, error) {
 	res, err := db.Query(`
 		SELECT * FROM films`)
 	if err != nil {
-		log.Fatalf("Unexpected  error during getting  films %v", err)
+		log.Printf("Unexpected  error during getting  films %v", err)
 		return nil, err
 	}
 	return res, nil
@@ -203,10 +199,10 @@ func ChangeFilmInfoDB(id int, name, description string, enterdate time.Time, sco
 		WHERE id = $7`,
 		name, description, enterdate, float64(score/votes), score, votes, id)
 	if err != nil {
-		fmt.Println("Error during setting new film data")
+		log.Println("Error during setting new film data")
 		return false, err
 	}
-	fmt.Println(result)
+	log.Println(result)
 
 	DeleteFilmActersDB(id)
 
@@ -231,9 +227,9 @@ func DeleteFilmActersDB(filmID int) (bool, error) {
 	res, err := db.Exec(`
 		DELETE FROM film_acters WHERE film_id  =   $1`, filmID)
 	if err != nil {
-		fmt.Printf("Не удалось удалить %e\n", err)
+		log.Printf("Could not delete %e\n", err)
 		return false, err
 	}
-	fmt.Println(res)
+	log.Println(res)
 	return true, nil
 }
